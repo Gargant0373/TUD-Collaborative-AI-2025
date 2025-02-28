@@ -7,6 +7,8 @@ class TrustBeliefs(Enum):
     SEARCH_COMPETENCE = 2
     RESCUE_WILLINGNESS = 3
     RESCUE_COMPETENCE = 4
+    REMOVE_WILLINGNESS = 5
+    REMOVE_COMPETENCE = 6
 
 class TrustService:
     
@@ -22,7 +24,9 @@ class TrustService:
             #         TrustBeliefs.SEARCH_WILLINGNESS: 0.85,
             #         TrustBeliefs.SEARCH_COMPETENCE: 0.75,
             #         TrustBeliefs.RESCUE_WILLINGNESS: 0.65,
-            #         TrustBeliefs.RESCUE_COMPETENCE: 0.55
+            #         TrustBeliefs.RESCUE_COMPETENCE: 0.55,
+            #         TrustBeliefs.REMOVE_WILLINGNESS: 0.75,
+            #         TrustBeliefs.REMOVE_COMPETENCE: 0.75
             #     },
             #     ...
             # }
@@ -48,7 +52,9 @@ class TrustService:
                     'search_willingness',
                     'search_competence',
                     'rescue_willingness',
-                    'rescue_competence'
+                    'rescue_competence',
+                    'remove_willingness',
+                    'remove_competence'
                 ])
             
     def load_trust_file(self):
@@ -62,7 +68,9 @@ class TrustService:
                     TrustBeliefs.SEARCH_WILLINGNESS: float(row['search_willingness']),
                     TrustBeliefs.SEARCH_COMPETENCE: float(row['search_competence']),
                     TrustBeliefs.RESCUE_WILLINGNESS: float(row['rescue_willingness']),
-                    TrustBeliefs.RESCUE_COMPETENCE: float(row['rescue_competence'])
+                    TrustBeliefs.RESCUE_COMPETENCE: float(row['rescue_competence']),
+                    TrustBeliefs.REMOVE_WILLINGNESS: float(row['remove_willingness']),
+                    TrustBeliefs.REMOVE_COMPETENCE: float(row['remove_competence'])
                 }
                 self.trust_scores[user_id] = trust_score
         
@@ -76,7 +84,9 @@ class TrustService:
                 'search_willingness',
                 'search_competence',
                 'rescue_willingness',
-                'rescue_competence'
+                'rescue_competence',
+                'remove_willingness',
+                'remove_competence'
             ]
             writer = csv.DictWriter(f, fieldnames=fieldnames)
             writer.writeheader()
@@ -86,7 +96,9 @@ class TrustService:
                     'search_willingness': score[TrustBeliefs.SEARCH_WILLINGNESS],
                     'search_competence': score[TrustBeliefs.SEARCH_COMPETENCE],
                     'rescue_willingness': score[TrustBeliefs.RESCUE_WILLINGNESS],
-                    'rescue_competence': score[TrustBeliefs.RESCUE_COMPETENCE]
+                    'rescue_competence': score[TrustBeliefs.RESCUE_COMPETENCE],
+                    'remove_willingness': score[TrustBeliefs.REMOVE_WILLINGNESS],
+                    'remove_competence': score[TrustBeliefs.REMOVE_COMPETENCE]
                 })
         
     def trigger_trust_change(self, trust_belief, user_id, send_message, value, weight=1, message=None):
