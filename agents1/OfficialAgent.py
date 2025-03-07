@@ -504,7 +504,6 @@ class BaselineAgent(ArtificialBrain):
                         # Wait for the human to help removing the obstacle and remove the obstacle together
                         if (self.received_messages_content and self.received_messages_content[
                             -1] == 'Remove') or self._remove_together_chosen or self._waiting_for_human_to_remove_together:
-
                             if not self._remove_together_chosen:
                                 self._remove_together_chosen = True  # Mark that "Remove together" was chosen
                                 self._answered = True
@@ -512,9 +511,19 @@ class BaselineAgent(ArtificialBrain):
                                     self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_WILLINGNESS, self._human_name, self._send_message, 1, 0.1)
                                 else:
                                     self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_WILLINGNESS, self._human_name, self._send_message, 1, 0.2)
-
                             # Tell the human to come over and be idle until human arrives
                             if not state[{'is_human_agent': True}]:
+                                current_tick = state['World']['nr_ticks']
+                                # If 300 ticks have passed and the human has NOT arrived → Remove alone
+                                if self._waiting_start_tick and current_tick - self._waiting_start_tick >= 300:
+                                    self._send_message(f'I’ve waited too long! I will move on to something else', 'RescueBot')
+
+                                    self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_COMPETENCE, self._human_name,self._send_message, -1, 0.3)
+
+                                    self._to_search.append(self._door['room_name'])
+                                    self._phase = Phase.FIND_NEXT_GOAL
+                                
+                                    return None, {}
                                 if not self._waiting_for_human_to_remove_together:
                                     self._send_message('Please come to ' + str(self._door['room_name']) + ' to remove rock together. I will wait 30 seconds for you!',
                                                     'RescueBot') # Message the human only once
@@ -522,8 +531,6 @@ class BaselineAgent(ArtificialBrain):
                                     self._waiting_start_tick = state['World']['nr_ticks']  # Store the tick when waiting starts
                                 return None, {}
                             
-                            # Keep checking if the human has arrived withing 300 ticks(30 seconds)
-                            current_tick = state['World']['nr_ticks']
                             # Tell the human to remove the obstacle when he/she arrives
                             if state[{'is_human_agent': True}]:
                                 self._send_message('You arrived in time! Lets remove rock blocking ' + str(self._door['room_name']) + '!',
@@ -535,17 +542,6 @@ class BaselineAgent(ArtificialBrain):
                                 self._waiting_start_tick = None
                                 self._waiting_for_human_to_remove_together = False
                                 self._remove_together_chosen = False
-                                return None, {}
-
-                            # If 300 ticks have passed and the human has NOT arrived → Remove alone
-                            if current_tick - self._waiting_start_tick >= 300:
-                                self._send_message(f'I’ve waited too long! I will move on to something else', 'RescueBot')
-
-                                self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_COMPETENCE, self._human_name,self._send_message, -1, 0.3)
-
-                                self._to_search.append(self._door['room_name'])
-                                self._phase = Phase.FIND_NEXT_GOAL
-                                
                                 return None, {}
                         # Remain idle untill the human communicates what to do with the identified obstacle 
                         else:
