@@ -16,12 +16,13 @@ class TrustBeliefs(Enum):
 class Baselines(Enum):
     ALWAYS_TRUST = 1
     NEVER_TRUST = -1
+    RANDOM_TRUST = 2
     ADAPTIVE = 0
 
 class TrustService:
     HEADER = ['user_id'] + [belief.name.lower() for belief in TrustBeliefs]
     
-    def __init__(self, baseline=Baselines.ADAPTIVE):
+    def __init__(self, baseline=Baselines.RANDOM_TRUST):
         """
         Initializes the TrustService class.
         Attributes:
@@ -188,6 +189,9 @@ class TrustService:
                 v["rescued"] = rescued
                 break
 
+    def is_random_baseline(self):
+        return self.baseline == Baselines.RANDOM_TRUST
+    
     def plot_trust_evolution(self, user_id):
         """
         Reads the evolution log for a given user and plots the evolution

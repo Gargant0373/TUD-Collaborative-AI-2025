@@ -1423,6 +1423,9 @@ class BaselineAgent(ArtificialBrain):
         if not hasattr(self, "trustService") or not hasattr(self, "_human_name"):
             return False  # Safety check to ensure trust service and human name are available
 
+        if self.trustService.is_random_baseline():
+            return random.random() < 0.5
+        
         competence_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.RESCUE_COMPETENCE, 0.0)
 
         return random.random() < self.normalize(competence_value)
@@ -1434,6 +1437,9 @@ class BaselineAgent(ArtificialBrain):
         """
         if not hasattr(self, "trustService") or not hasattr(self, "_human_name"):
             return False  # Safety check to ensure trust service and human name are available
+
+        if self.trustService.is_random_baseline():
+            return random.random() < 0.5
 
         willingness_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.RESCUE_WILLINGNESS, 0.0)
 
@@ -1447,6 +1453,9 @@ class BaselineAgent(ArtificialBrain):
         if not hasattr(self, "trustService") or not hasattr(self, "_human_name"):
             return False  # Safety check to ensure trust service and human name are available
 
+        if self.trustService.is_random_baseline():
+            return random.random() < 0.5
+        
         competence_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.REMOVE_COMPETENCE, 0.0)
 
         return random.random() < self.normalize(competence_value)
@@ -1459,6 +1468,9 @@ class BaselineAgent(ArtificialBrain):
         if not hasattr(self, "trustService") or not hasattr(self, "_human_name"):
             return False  # Safety check to ensure trust service and human name are available
 
+        if self.trustService.is_random_baseline():
+            return random.random() < 0.5
+        
         willingness_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.REMOVE_WILLINGNESS, 0.0)
 
         return random.random() < self.normalize(willingness_value)
@@ -1472,6 +1484,9 @@ class BaselineAgent(ArtificialBrain):
         if not hasattr(self, "trustService") or not hasattr(self, "_human_name"):
             return False  # Safety check to ensure trust service and human name are available
 
+        if self.trustService.is_random_baseline():
+            return random.random() < 0.5
+        
         # Get competence and willingness trust values
         competence_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.RESCUE_COMPETENCE, 0.0)
         willingness_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.RESCUE_WILLINGNESS, 0.0)
@@ -1491,6 +1506,9 @@ class BaselineAgent(ArtificialBrain):
         if not hasattr(self, "trustService") or not hasattr(self, "_human_name"):
             return False  # Safety check to ensure trust service and human name are available
 
+        if self.trustService.is_random_baseline():
+            return random.random() < 0.5
+        
         # Get competence and willingness trust values
         competence_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.REMOVE_COMPETENCE, 0.0)
         willingness_value = self.trustService.trust_scores.get(self._human_name, {}).get(TrustBeliefs.REMOVE_WILLINGNESS, 0.0)
