@@ -55,6 +55,7 @@ class BaselineAgent(ArtificialBrain):
         self._trust_check_passed_for_rescue = None 
         self._going_to_help_human_remove = None
         self._waiting_for_human_to_start_removing = None
+        self._object_found_is_tree = None
         self._tick = None
         self._slowdown = slowdown
         self._condition = condition
@@ -408,6 +409,11 @@ class BaselineAgent(ArtificialBrain):
                     if 'class_inheritance' in info and 'ObstacleObject' in info['class_inheritance']:
                         objects.append(info)
                         obstacle_found = True
+
+                        if 'class_inheritance' in info and 'ObstacleObject' in info['class_inheritance'] and 'tree' in info[
+                            'obj_id']:
+                            self._object_found_is_tree = True
+
                         break
 
                 if not obstacle_found and self._going_to_help_human_remove:
@@ -423,14 +429,36 @@ class BaselineAgent(ArtificialBrain):
                     self._phase = Phase.ENTER_ROOM
 
                 if obstacle_found and self._going_to_help_human_remove:
-                    self._send_message('I confirm there is an obstacle at ' + str(self._door['room_name']) + 
-                    '. Please initiate the removal procedure. I will help you!','RescueBot')
 
-                    # Starting waiting for the human
-                    self._waiting_for_human_to_start_removing = True
-                    self._going_to_help_human_remove = False
-                    self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_WILLINGNESS, self._human_name, self._send_message, 1)
-                    self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_COMPETENCE, self._human_name,self._send_message, 1)
+                    if not self._object_found_is_tree:
+                        self._send_message('I confirm there is an obstacle at ' + str(self._door['room_name']) + 
+                        '. Please initiate the removal procedure. I will help you!','RescueBot')
+
+                        # Starting waiting for the human
+                        self._waiting_for_human_to_start_removing = True
+                        self._going_to_help_human_remove = False
+                        self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_WILLINGNESS, self._human_name, self._send_message, 1)
+                        self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_COMPETENCE, self._human_name,self._send_message, 1)
+
+                    if self._object_found_is_tree:
+                        self._send_message('I confirm there is an obstacle at ' + str(self._door['room_name']) + 
+                        '. It is a tree. I will remove it myself!','RescueBot')
+
+                        self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_WILLINGNESS, self._human_name, self._send_message, 1)
+                        self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_COMPETENCE, self._human_name,self._send_message, 1)
+
+                        self._going_to_help_human_remove = False
+                        self._object_found_is_tree = False
+
+                        self._answered = True
+                        self._waiting = False
+                        self._remove = True  # Ensure removal happens immediately
+                        self._phase = Phase.ENTER_ROOM
+
+                        action = RemoveObject.__name__, {'object_id': info['obj_id']}
+                        self._remove = False 
+                                
+                        return action 
 
                     return None, {}
             
