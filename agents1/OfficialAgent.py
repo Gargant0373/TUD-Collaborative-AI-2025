@@ -436,6 +436,7 @@ class BaselineAgent(ArtificialBrain):
 
                         # Starting waiting for the human
                         self._waiting_for_human_to_start_removing = True
+                        self._waiting_start_tick = state['World']['nr_ticks']
                         self._going_to_help_human_remove = False
                         self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_WILLINGNESS, self._human_name, self._send_message, 1)
                         self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_COMPETENCE, self._human_name,self._send_message, 1)
@@ -471,6 +472,23 @@ class BaselineAgent(ArtificialBrain):
                         self._waiting = False
                         self._waiting_for_human_to_start_removing = False
                         self._phase = Phase.ENTER_ROOM
+
+                    current_tick = state['World']['nr_ticks']
+                    if current_tick - self._waiting_start_tick >= 200:
+                            self._send_message(f'I’ve waited too long and you still did not initiate the removal! I will move on to something else', 'RescueBot')
+                            self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_COMPETENCE, self._human_name,self._send_message, -1, 0.2)
+                            self.trustService.trigger_trust_change(TrustBeliefs.REMOVE_WILLINGNESS, self._human_name,self._send_message, -1, 0.2)
+
+                            self._answered = False
+                            self._remove = False
+                            self._waiting = False
+                            self._waiting_for_human_to_start_removing = False
+                            self._waiting_start_tick = None
+                            self._to_search.append(self._door['room_name'])
+                            self._phase = Phase.FIND_NEXT_GOAL
+                            
+                            return None, {}
+
                     return None, {}
                     
 
@@ -537,7 +555,7 @@ class BaselineAgent(ArtificialBrain):
                                 self._remove_together_chosen = False
                                 return None, {}
 
-                            # If 300 ticks have passed and the human has NOT arrived → Remove alone
+                            # If 300 ticks have passed and the human has NOT arrived
                             if current_tick - self._waiting_start_tick >= 300:
                                 self._send_message(f'I’ve waited too long! I will move on to something else', 'RescueBot')
 
