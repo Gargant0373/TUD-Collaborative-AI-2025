@@ -928,7 +928,7 @@ class BaselineAgent(ArtificialBrain):
                         return None, {}
                 # Make a plan to rescue a found mildly injured victim together if the human decides so
                 if (self.received_messages_content and self.received_messages_content[
-                    -1] == 'Rescue together' and 'mild' in self._recent_vic) or self._rescue_together_chosen_mildly or self._waiting_for_human_to_rescue_together_mildly:
+                    -1] == 'Rescue together' and self._recent_vic is not None and 'mild' in self._recent_vic) or self._rescue_together_chosen_mildly or self._waiting_for_human_to_rescue_together_mildly:
 
                     if not self._rescue_together_chosen_mildly:
                         self._trust_check_passed_for_rescue = self._passesCheckForRescue()
