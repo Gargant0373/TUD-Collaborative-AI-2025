@@ -707,7 +707,7 @@ class BaselineAgent(ArtificialBrain):
                                     return None, {}
 
                                 # If 150 ticks have passed and the human has NOT arrived → Remove alone
-                                if current_tick - self._waiting_start_tick >= 150:
+                                if self._waiting_start_tick is not None and current_tick - self._waiting_start_tick >= 150:
                                     self._send_message(f'I’ve waited too long! I will remove the stones alone.', 'RescueBot')
                                     self._send_message(f'Removing stones blocking {self._door["room_name"]}.', 'RescueBot')
 
