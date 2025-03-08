@@ -96,7 +96,7 @@ class BaselineAgent(ArtificialBrain):
                                     algorithm=Navigator.A_STAR_ALGORITHM)
         # Initialization of the trust service
         self.trustService = TrustService()
-        self.trustService.load_trust_file()
+        self.trustService.load_trust_file(self._human_name)
 
     def filter_observations(self, state):
         # Filtering of the world state before deciding on an action 
