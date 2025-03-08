@@ -22,7 +22,7 @@ class Baselines(Enum):
 class TrustService:
     HEADER = ['user_id'] + [belief.name.lower() for belief in TrustBeliefs]
     
-    def __init__(self, baseline=Baselines.RANDOM_TRUST):
+    def __init__(self, baseline=Baselines.ADAPTIVE):
         """
         Initializes the TrustService class.
         Attributes:
