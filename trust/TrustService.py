@@ -22,7 +22,7 @@ class Baselines(Enum):
 class TrustService:
     HEADER = ['user_id'] + [belief.name.lower() for belief in TrustBeliefs]
     
-    def __init__(self, baseline=Baselines.RANDOM_TRUST):
+    def __init__(self, baseline=Baselines.ADAPTIVE):
         """
         Initializes the TrustService class.
         Attributes:
@@ -59,14 +59,30 @@ class TrustService:
         self.game_timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         self.evolution_file = self.evolution_folder / f"trust_evolution_{self.game_timestamp}.csv"
     
-    def create_trust_file(self):
+    def create_trust_file(self, human_name):
         if not self.csv_file.exists():
             with self.csv_file.open('w', newline='') as f:
                 writer = csv.writer(f)
                 writer.writerow(self.HEADER)
+        
+        with self.csv_file.open('r+', newline='') as f:
+            reader = csv.DictReader(f)
+            rows = list(reader)  # Read the existing data
+            user_exists = any(row['user_id'] == human_name for row in rows)
+
+            # Ensuring the new user is added to the CSV
+            if not user_exists:
+                row = {'user_id': human_name, **{belief.name.lower(): 0.0 for belief in TrustBeliefs}}
+                rows.append(row)
+
+            f.seek(0)
+            writer = csv.DictWriter(f, fieldnames=self.HEADER)
+            writer.writeheader()
+            writer.writerows(rows)
+            f.truncate()
     
-    def load_trust_file(self):
-        self.create_trust_file()
+    def load_trust_file(self,human_name):
+        self.create_trust_file(human_name)
         with self.csv_file.open('r', newline='') as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -78,7 +94,6 @@ class TrustService:
                 self.trust_scores[user_id] = trust_score
         
     def save_trust_file(self):
-        self.create_trust_file()
         plot_users = ["Ben", "Charlie", "Alice"]
         with self.csv_file.open('w', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.HEADER)
