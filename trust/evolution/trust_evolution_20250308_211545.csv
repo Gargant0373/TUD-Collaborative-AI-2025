@@ -1,0 +1,3 @@
+timestamp,user_id,trust_belief,old_score,new_score,change_direction,weight,message
+2025-03-08T21:16:18.490655,norman,REMOVE_WILLINGNESS,0.0,0.09531017980432487,1,0.1,
+2025-03-08T21:16:18.494809,norman,REMOVE_COMPETENCE,0.0,0.09531017980432487,1,0.1,
